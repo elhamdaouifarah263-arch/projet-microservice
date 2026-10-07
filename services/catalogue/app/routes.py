@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from app.db import SessionLocal
 from app.models import Medicament
@@ -29,7 +30,14 @@ async def creer(medicament: MedicamentCreate):
     async with SessionLocal() as session:
         nouveau = Medicament(**medicament.model_dump())
         session.add(nouveau)
-        await session.commit()
+        try:
+            await session.commit()
+        except IntegrityError:
+            await session.rollback()
+            raise HTTPException(
+                status_code=409,
+                detail="Un médicament avec ce nom existe déjà",
+            )
         return nouveau
 
 
@@ -41,7 +49,14 @@ async def modifier(medicament_id: int, medicament: MedicamentCreate):
             raise HTTPException(status_code=404, detail="Médicament introuvable")
         for champ, valeur in medicament.model_dump().items():
             setattr(existant, champ, valeur)
-        await session.commit()
+        try:
+            await session.commit()
+        except IntegrityError:
+            await session.rollback()
+            raise HTTPException(
+                status_code=409,
+                detail="Un médicament avec ce nom existe déjà",
+            )
         return existant
 
 
