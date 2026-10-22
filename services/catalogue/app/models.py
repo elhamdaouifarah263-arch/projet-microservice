@@ -12,3 +12,4 @@ class Medicament(Base):
     nom: Mapped[str] = mapped_column(unique=True)
     prix: Mapped[float]
     stock: Mapped[int] = mapped_column(default=0)
+    nomfournisseur: Mapped[str] = mapped_column()

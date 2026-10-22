@@ -16,6 +16,7 @@ class MedicamentCreate(BaseModel):
         ge=0,
         default=0
     )
+    nomfournisseur: str = Field(min_length=1, max_length=100)
 
 
 class MedicamentRead(MedicamentCreate):
